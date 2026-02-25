@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Keybox Checker</string>
+    <string name="integrity_status">Estado de Integridad</string>
+    <string name="error_details">Detalles del Error</string>
+    <string name="checking">COMPROBANDO...</string>
+    <string name="check_now">COMPROBAR AHORA</string>
+    <string name="hide_certs">▲ Ocultar Certificados (%1$d)</string>
+    <string name="show_certs">▼ Mostrar Certificados (%1$d)</string>
+    <string name="cert_chain">Cadena de Certificados</string>
+    <string name="cert_desc">Desde el dispositivo hasta la raíz (Google).</string>
+    <string name="net_cond">Condición de Red</string>
+    <string name="net_desc">Espera hasta que se cumpla la condición.</string>
+    <string name="dev_cond">Condiciones del Dispositivo</string>
+    <string name="dev_desc">Restricciones para comprobaciones en segundo plano.</string>
+    <string name="req_charge">Requiere Carga</string>
+    <string name="req_charge_desc">Ejecutar solo al estar enchufado</string>
+    <string name="req_batt">Batería No Agotada</string>
+    <string name="req_batt_desc">Omitir si la batería está baja</string>
+    <string name="req_idle">Dispositivo Inactivo</string>
+    <string name="req_idle_desc">Ejecutar cuando el dispositivo está inactivo</string>
+    <string name="mon_int">Intervalo de Monitoreo</string>
+    <string name="auto_mon">Monitoreo Automático</string>
+    <string name="net_any">Cualquier Red</string>
+    <string name="net_any_desc">Wi-Fi o Celular</string>
+    <string name="net_wifi">Solo Wi-Fi</string>
+    <string name="net_wifi_desc">Conexiones no medidas</string>
+    <string name="net_roam">Sin Roaming</string>
+    <string name="net_roam_desc">Wi-Fi + Celular, sin roaming</string>
+    <string name="net_cell">Solo Celular</string>
+    <string name="net_cell_desc">Solo conexiones medidas</string>
+</resources>

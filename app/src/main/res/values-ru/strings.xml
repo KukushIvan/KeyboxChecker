@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Keybox Checker</string>
+    <string name="integrity_status">Статус проверки</string>
+    <string name="error_details">Детали ошибки</string>
+    <string name="checking">ПРОВЕРКА...</string>
+    <string name="check_now">ПРОВЕРИТЬ</string>
+    <string name="hide_certs">▲ Скрыть сертификаты (%1$d)</string>
+    <string name="show_certs">▼ Показать сертификаты (%1$d)</string>
+    <string name="cert_chain">Цепочка сертификатов</string>
+    <string name="cert_desc">От устройства к корню (Google).</string>
+    <string name="net_cond">Условия сети</string>
+    <string name="net_desc">Фоновая проверка ждет нужной сети.</string>
+    <string name="dev_cond">Условия устройства</string>
+    <string name="dev_desc">Ограничения для фоновых проверок.</string>
+    <string name="req_charge">Только на зарядке</string>
+    <string name="req_charge_desc">Проверять при подключении к сети</string>
+    <string name="req_batt">При нормальном заряде</string>
+    <string name="req_batt_desc">Пропускать, если батарея разряжена</string>
+    <string name="req_idle">В режиме покоя</string>
+    <string name="req_idle_desc">Проверять, когда экран выключен</string>
+    <string name="mon_int">Интервал проверки</string>
+    <string name="auto_mon">Фоновый мониторинг</string>
+    <string name="net_any">Любая сеть</string>
+    <string name="net_any_desc">Wi-Fi или Мобильная сеть</string>
+    <string name="net_wifi">Только Wi-Fi</string>
+    <string name="net_wifi_desc">Нелимитированное соединение</string>
+    <string name="net_roam">Без роуминга</string>
+    <string name="net_roam_desc">Wi-Fi + Мобильная, без роуминга</string>
+    <string name="net_cell">Только Мобильная</string>
+    <string name="net_cell_desc">Лимитированное соединение</string>
+</resources>

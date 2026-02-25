@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Keybox Checker</string>
+    <string name="integrity_status">Integrity Status</string>
+    <string name="error_details">Error Details</string>
+    <string name="checking">CHECKING...</string>
+    <string name="check_now">CHECK NOW</string>
+    <string name="hide_certs">▲ Hide Certificates (%1$d)</string>
+    <string name="show_certs">▼ Show Certificates (%1$d)</string>
+    <string name="cert_chain">Attestation Certificate Chain</string>
+    <string name="cert_desc">From leaf (device) to root (Google).</string>
+    <string name="net_cond">Network Condition</string>
+    <string name="net_desc">Worker will wait until the selected condition is met.</string>
+    <string name="dev_cond">Device Conditions</string>
+    <string name="dev_desc">Additional constraints for background checks.</string>
+    <string name="req_charge">Require Charging</string>
+    <string name="req_charge_desc">Run only while plugged in</string>
+    <string name="req_batt">Battery Not Low</string>
+    <string name="req_batt_desc">Skip if battery is low</string>
+    <string name="req_idle">Device Idle</string>
+    <string name="req_idle_desc">Run only when device is idle</string>
+    <string name="mon_int">Monitoring Interval</string>
+    <string name="auto_mon">Auto-Monitoring</string>
+    <string name="net_any">Any Network</string>
+    <string name="net_any_desc">Wi-Fi or Cellular</string>
+    <string name="net_wifi">Wi-Fi Only</string>
+    <string name="net_wifi_desc">Only unmetered connections</string>
+    <string name="net_roam">Not Roaming</string>
+    <string name="net_roam_desc">Wi-Fi + Cell, skip roaming</string>
+    <string name="net_cell">Cellular Only</string>
+    <string name="net_cell_desc">Only metered connections</string>
+</resources>

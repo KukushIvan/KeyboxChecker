@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Keybox Checker</string>
+    <string name="integrity_status">完整性状态</string>
+    <string name="error_details">错误详情</string>
+    <string name="checking">检查中...</string>
+    <string name="check_now">立即检查</string>
+    <string name="hide_certs">▲ 隐藏证书 (%1$d)</string>
+    <string name="show_certs">▼ 显示证书 (%1$d)</string>
+    <string name="cert_chain">证明证书链</string>
+    <string name="cert_desc">从设备到根(Google)。</string>
+    <string name="net_cond">网络条件</string>
+    <string name="net_desc">后台工作程序将等待满足的条件。</string>
+    <string name="dev_cond">设备条件</string>
+    <string name="dev_desc">后台检查的附加限制。</string>
+    <string name="req_charge">需要充电</string>
+    <string name="req_charge_desc">仅在插入电源时运行</string>
+    <string name="req_batt">电池电量正常</string>
+    <string name="req_batt_desc">电池电量低时跳过</string>
+    <string name="req_idle">设备空闲</string>
+    <string name="req_idle_desc">仅在设备处于空闲状态时运行</string>
+    <string name="mon_int">监控间隔</string>
+    <string name="auto_mon">自动监控</string>
+    <string name="net_any">任何网络</string>
+    <string name="net_any_desc">Wi-Fi 或移动网络</string>
+    <string name="net_wifi">仅 Wi-Fi</string>
+    <string name="net_wifi_desc">非计费连接</string>
+    <string name="net_roam">非漫游</string>
+    <string name="net_roam_desc">Wi-Fi + 蜂窝数据，跳过漫游</string>
+    <string name="net_cell">仅移动网络</string>
+    <string name="net_cell_desc">按流量计费的连接</string>
+</resources>
