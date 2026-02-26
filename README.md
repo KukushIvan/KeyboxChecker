@@ -22,7 +22,13 @@ This tool is especially useful for custom ROM users, developers, and security en
 
 ## 📸 Screenshots
 
-*(You can add screenshots of your main screen and certificate list here)*
+| Certified ✅ | Banned ❌ | Banned + Check |
+|:---:|:---:|:---:|
+| ![Certified](screenshots/screen_certified.jpg) | ![Banned](screenshots/screen_banned.jpg) | ![Banned with certs](screenshots/screen_banned_certs.jpg) |
+
+| Certificate Chain | Settings |
+|:---:|:---:|
+| ![Cert Detail](screenshots/screen_cert_detail.jpg) | ![Settings](screenshots/screen_settings.jpg) |
 
 ## 🚀 Installation & Build
 
