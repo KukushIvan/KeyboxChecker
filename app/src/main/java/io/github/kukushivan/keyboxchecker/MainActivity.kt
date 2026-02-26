@@ -157,12 +157,12 @@ object CheckerLogic {
     private const val PREF_ETAG = "crl_etag"
     private const val CACHE_FILE = "crl_cache.json"
 
-    fun checkKeyboxDetailed(context: Context): Pair<String, List<CertInfo>> {
+    fun checkKeyboxDetailed(context: Context, forceNetwork: Boolean = false): Pair<String, List<CertInfo>> {
         return try {
             val chain = getAttestationChain()
             if (chain.isEmpty()) return "Error: No attestation certificates" to emptyList()
 
-            checkCerts(context, chain)
+            checkCerts(context, chain, forceNetwork)
         } catch (e: Exception) {
             android.util.Log.e("KeyboxChecker", "Check failed", e)
             "Error: ${e.localizedMessage}" to emptyList()
@@ -174,46 +174,65 @@ fun checkKeyboxStatus(context: Context): String = checkKeyboxDetailed(context).f
 
     private fun getAttestationChain(): List<X509Certificate> {
         val ks = KeyStore.getInstance("AndroidKeyStore").apply { load(null) }
+        val aliasPrefix = "keybox_attest_"
 
-        // Unconditionally delete old keys so we always generate a fresh hardware challenge
-        if (ks.containsAlias(ATTESTATION_ALIAS)) {
-            ks.deleteEntry(ATTESTATION_ALIAS)
-        }
-
-        // Generate key with fresh Attestation Challenge
-        val specBuilder = KeyGenParameterSpec.Builder(
-            ATTESTATION_ALIAS,
-            KeyProperties.PURPOSE_SIGN
-        )
-            .setAlgorithmParameterSpec(java.security.spec.ECGenParameterSpec("secp256r1"))
-            .setDigests(KeyProperties.DIGEST_SHA256)
-            .setAttestationChallenge(System.currentTimeMillis().toString().toByteArray())
-            
-        // Try to force StrongBox on supported devices, fallback to TEE otherwise
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            try {
-                specBuilder.setIsStrongBoxBacked(true)
-                KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_EC, "AndroidKeyStore").run {
-                    initialize(specBuilder.build())
-                    generateKeyPair()
-                }
-            } catch (e: Exception) {
-                android.util.Log.w("KeyboxChecker", "StrongBox not supported, falling back to TEE", e)
-                ks.deleteEntry(ATTESTATION_ALIAS)
-                specBuilder.setIsStrongBoxBacked(false)
-                KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_EC, "AndroidKeyStore").run {
-                    initialize(specBuilder.build())
-                    generateKeyPair()
+        // Clean up old keys to prevent Keystore race conditions and storage bloat
+        try {
+            val aliases = ks.aliases().toList()
+            for (a in aliases) {
+                if (a.startsWith(aliasPrefix)) {
+                    ks.deleteEntry(a)
                 }
             }
-        } else {
+        } catch (e: Exception) {
+            android.util.Log.e("KeyboxChecker", "Failed to cleanup old keys", e)
+        }
+
+        val alias = aliasPrefix + System.currentTimeMillis()
+        val now = java.util.Date()
+        val challenge = now.toString().toByteArray()
+
+        // 1. Try EC (Elliptic Curve) generation first
+        try {
+            val specBuilder = KeyGenParameterSpec.Builder(
+                alias,
+                KeyProperties.PURPOSE_SIGN
+            ).apply {
+                setAlgorithmParameterSpec(java.security.spec.ECGenParameterSpec("secp256r1"))
+                setDigests(KeyProperties.DIGEST_SHA256)
+                setCertificateNotBefore(now)
+                setAttestationChallenge(challenge)
+            }
+
             KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_EC, "AndroidKeyStore").run {
                 initialize(specBuilder.build())
                 generateKeyPair()
             }
+            ks.getCertificateChain(alias)?.let { chain ->
+                return chain.map { it as X509Certificate }
+            }
+        } catch (e: Exception) {
+            android.util.Log.w("KeyboxChecker", "EC generation failed, falling back to RSA", e)
         }
 
-        val chain = ks.getCertificateChain(ATTESTATION_ALIAS) ?: return emptyList()
+        // 2. Fallback to RSA if EC is broken on this specific ROM's TEE
+        val rsaAlias = alias + "_rsa"
+        val rsaSpecBuilder = KeyGenParameterSpec.Builder(
+            rsaAlias,
+            KeyProperties.PURPOSE_SIGN
+        ).apply {
+            setDigests(KeyProperties.DIGEST_SHA256)
+            setSignaturePaddings(KeyProperties.SIGNATURE_PADDING_RSA_PKCS1)
+            setKeySize(2048)
+            setAttestationChallenge(challenge)
+        }
+
+        KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_RSA, "AndroidKeyStore").run {
+            initialize(rsaSpecBuilder.build())
+            generateKeyPair()
+        }
+
+        val chain = ks.getCertificateChain(rsaAlias) ?: return emptyList()
         return chain.map { it as X509Certificate }
     }
 
@@ -221,13 +240,13 @@ fun checkKeyboxStatus(context: Context): String = checkKeyboxDetailed(context).f
      * Downloads the CRL (Certificate Revocation List) with ETag caching support.
      * Returns the raw JSON string.
      */
-    private fun fetchCRL(context: Context): String {
+    private fun fetchCRL(context: Context, forceNetwork: Boolean): String {
         val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
         val cachedEtag = prefs.getString(PREF_ETAG, null)
         val cacheFile = File(context.filesDir, CACHE_FILE)
 
         // 5-minute local cache to prevent hammering Google servers and DNS
-        if (cacheFile.exists()) {
+        if (!forceNetwork && cacheFile.exists()) {
             val ageMs = System.currentTimeMillis() - cacheFile.lastModified()
             if (ageMs < 5 * 60 * 1000L) {
                 android.util.Log.d("KeyboxChecker", "Using fresh local cache (age: ${ageMs / 1000}s). Network skipped.")
@@ -288,10 +307,10 @@ fun checkKeyboxStatus(context: Context): String = checkKeyboxDetailed(context).f
         }
     }
 
-    private fun checkCerts(context: Context, certs: List<X509Certificate>): Pair<String, List<CertInfo>> {
+    private fun checkCerts(context: Context, certs: List<X509Certificate>, forceNetwork: Boolean): Pair<String, List<CertInfo>> {
         return try {
             // Fetch JSON (from Network or Cache)
-            val crlJson = fetchCRL(context).lowercase()
+            val crlJson = fetchCRL(context, forceNetwork).lowercase()
             var hasRevoked = false
             val list = certs.mapIndexed { i, cert ->
                 val rawSnHex = cert.serialNumber.toString(16).lowercase()
@@ -556,7 +575,7 @@ fun MainScreen() {
             isChecking = true; errorMessage = null; certInfoList = emptyList()
             scope.launch(Dispatchers.IO) {
                 try {
-                    val (status, certs) = CheckerLogic.checkKeyboxDetailed(context)
+                    val (status, certs) = CheckerLogic.checkKeyboxDetailed(context, forceNetwork = true)
                     withContext(Dispatchers.Main) {
                         currentStatus = status; certInfoList = certs; showCerts = certs.isNotEmpty()
                         prefs.edit().putString(KEY_LAST_STATUS, status).apply()
